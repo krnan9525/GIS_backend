@@ -16,7 +16,21 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
+# Serializers define the API representation.
+from django.contrib.auth.models import User
+from rest_framework import serializers, viewsets, routers
+from REST_FRAMEWORK import views
+
+router = routers.DefaultRouter()
+router.register(r'api/users', views.UserViewSet)
+router.register(r'api/groups', views.GroupViewSet)
+# router.register(r'api/get_new_token', views.GroupViewSet)
+# router.register(r'api/example', views.ExampleView)
+
 urlpatterns = [
+    url(r'^', include(router.urls)),
     url(r'^gis/', include('GIS1.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^api/', include('REST_FRAMEWORK.urls')),
 ]
