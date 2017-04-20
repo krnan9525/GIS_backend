@@ -24,7 +24,7 @@ SECRET_KEY = '0(9lo#e9yr6#&5gf=*ok7!+p69*m3ovzys1t%-6j+=5^q*od$8'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['138.68.171.182']
+ALLOWED_HOSTS = ['138.68.171.182','localhost']
 
 # Application definition
 
@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'GIS1.apps.Gis1Config',
     'rest_framework',
     'REST_FRAMEWORK',
+    'rest_framework_gis',
     'rest_framework.authtoken',
+    'corsheaders',
 ]
 
 REST_FRAMEWORK = {
@@ -63,7 +65,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'GIS.urls'
 

@@ -10,5 +10,6 @@ urlpatterns = [
     url(r'^$', nv.BasicAuthentication),
     url(r'^example/', views.ExampleView),
     url(r'^token/', views.GetToken),
-
+    url(r'^submit_location/', views.Submit_Location),
+    url(r'^fetch_location/', views.Fetch_Location),
 ]

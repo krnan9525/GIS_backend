@@ -15,7 +15,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from REST_FRAMEWORK.models import Snippet
-from REST_FRAMEWORK.serializers import UserSerializer, GroupSerializer, SnippetSerializer
+from REST_FRAMEWORK.serializers import UserSerializer, GroupSerializer, SnippetSerializer, RecordSerializer, \
+    OutputRecordSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -47,3 +48,26 @@ def GetToken(request):
         token, created = Token.objects.get_or_create(user=request.user)
         content =  json.dumps ( {'token': token.key} )
         return HttpResponse(content)
+
+
+@api_view(['POST'])
+@permission_classes((IsAuthenticated, ))
+def Submit_Location(request):
+    if request.method == 'POST' :
+
+        print(repr(request.data))
+        serializer = RecordSerializer(data=request.data)
+        if(serializer.is_valid()):
+            serializer.save()
+            content = json.dumps({'status': "success"})
+            return HttpResponse(content)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@permission_classes((IsAuthenticated, ))
+def Fetch_Location(request):
+    if request.method == 'POST' :
+        serializer = OutputRecordSerializer(data=request.data)
+        if(serializer.is_valid()):
+            return HttpResponse(serializer.save(), status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 # Create your models here.
@@ -41,3 +42,8 @@ class WorldBorder(models.Model):
     # Returns the string representation of the model.
     def __str__(self):              # __unicode__ on Python 2
         return self.name
+
+
+class Activity_Record(models.Model):
+    location = models.MultiPointField()
+    user_id = models.ForeignKey(User)
