@@ -47,3 +47,9 @@ class WorldBorder(models.Model):
 class Activity_Record(models.Model):
     location = models.MultiPointField()
     user_id = models.ForeignKey(User)
+
+class Interest_Group(models.Model):
+    location = models.PointField()
+    name = models.CharField(max_length=500)
+    information = models.CharField(max_length=5000)
+    check_in_num = models.IntegerField()

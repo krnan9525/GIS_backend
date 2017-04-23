@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth.models import User, Group
 from django.contrib.gis.db import models
 from django.contrib.gis.geos import MultiPoint, Point, GEOSGeometry
@@ -5,7 +7,7 @@ from django.core.serializers import serialize
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
-from GIS1.models import Activity_Record
+from GIS1.models import Activity_Record, Interest_Group
 from REST_FRAMEWORK.models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
 
 
@@ -51,27 +53,30 @@ class SnippetSerializer(serializers.ModelSerializer):
         model = Snippet
         fields = ('id', 'title', 'code', 'linenos', 'language', 'style')
 
-class OutputRecordSerializer(serializers.Serializer):
+class OutputRecordSerializer(GeoFeatureModelSerializer):
     user_id = serializers.IntegerField()
-
-    class Mata:
-        model = Activity_Record
-        fields = ('location', 'user_id')
-
     def create(self, validated_data):
         try:
             temp_points = Activity_Record.objects.get(user_id_id=validated_data.get('user_id'))
             print(temp_points)
             g = temp_points
             buffer = GEOSGeometry.buffer(g.location,1)
-            return serialize('geojson', [buffer],
-                      geometry_field='location', fields=('user_id','location'))
+            print(buffer.geojson)
+            # return serialize('geojson', [buffer],
+            #           geometry_field='location', fields=('user_id','location'))
+            response_data = {}
+            response_data['buffer'] = buffer.geojson
+            response_data['user_id'] = validated_data.get('user_id')
+            json.dumps(response_data)
         except Activity_Record.DoesNotExist:
-            return 0
+            response_data = {}
+            response_data['status'] = "User id not found"
+            response_data['user_id'] =  validated_data.get('user_id')
+            json.dumps(response_data)
 
 
 class RecordSerializer(serializers.Serializer):
-    user_id = serializers.IntegerField(required=True)
+    # user_id = serializers.IntegerField(required=True)
     location_1 = serializers.FloatField(required=True)
     location_2 = serializers.FloatField(required=True)
 
@@ -82,9 +87,9 @@ class RecordSerializer(serializers.Serializer):
         print(validated_data.get('location_1'))
         print(validated_data.get('location_2'))
         temp_obj = dict()
-        temp_obj['user_id'] = User.objects.get(pk=validated_data.get('user_id'))
+        temp_obj['user_id'] = User.objects.get(pk=self.context.get("user_id"))
         try:
-            temp_points = Activity_Record.objects.get(user_id_id=validated_data.get('user_id')).location
+            temp_points = Activity_Record.objects.get(user_id_id=self.context.get("user_id")).location
             print(temp_points)
             g = temp_points
             g.append(Point((float)(validated_data.get('location_1')), (float)(validated_data.get('location_2'))))
@@ -95,3 +100,11 @@ class RecordSerializer(serializers.Serializer):
             g.append(Point( (float) (validated_data.get('location_1') ),(float) (validated_data.get('location_2') )))
             temp_obj['location'] = g
             return Activity_Record.objects.create(**temp_obj)
+
+
+
+class OutputInterestLocation(GeoFeatureModelSerializer):
+    class Meta:
+        model = Interest_Group
+        geo_field = "location"
+        fields = ('name','information','check_in_num')
